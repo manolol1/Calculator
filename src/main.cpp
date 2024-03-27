@@ -3,9 +3,15 @@
 
 #include <string>
 
-void home(int num);
+void home(float num);
 void error(String line1);
 float stringToNum(String str);
+float getInputNum();
+
+void addition(float n1);
+void subtraction(float n1);
+void multiplication(float n1);
+void division(float n1);
 
 int lcdColumns = 16;
 int lcdRows = 2;
@@ -39,7 +45,7 @@ class Button {
 Button enterButton = Button(4);
 Button clearButton = Button(35);
 Button dotButton = Button(14);
-Button plusButton = Button(24);
+Button plusButton = Button(23);
 Button minusButton = Button(2);
 Button multiplyButton = Button(18);
 Button divideButton = Button(19);
@@ -81,16 +87,49 @@ float stringToNum(std::string str) {
   }
 }
 
-void home(int num) {
-  lcd.clear();
-  lcd.setCursor(0, 0);
+float getInputNum() {
+  std::string inputStr = "0";
+  while (true) {
+    for (int i = 0; i < 10; i++) {
+      if (numberButtons[i].isPressed()) {
+        lcd.print(i);
+        inputStr += std::to_string(i);
+      }
+    }
 
+    if (dotButton.isPressed()) {
+      lcd.print(".");
+      inputStr += ".";
+    }
+
+    if (minusButton.isPressed()) {
+      if (inputStr == "") {
+        inputStr = "-0";
+        lcd.print("-");
+      }
+    }
+
+    if (enterButton.isPressed()) {
+      if (inputStr == "-0") lcd.print("0");
+      return stringToNum(inputStr);
+    }
+
+    if (clearButton.isPressed()) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      home(0);
+    }
+
+    delay(20);
+  }
+}
+
+void home(float num) {
   // set initial number if available
   std::string inputStr;
   if (num != 0) {
     inputStr = std::to_string(num);
     lcd.print(num);
-
   } else {
     inputStr = "0";
   }
@@ -109,14 +148,52 @@ void home(int num) {
     }
 
     if (clearButton.isPressed()) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
       home(0);
     }
 
     if (plusButton.isPressed()) {
+      if (inputStr == "-0") lcd.print("0");
+      addition(stringToNum(inputStr));
     }
 
-    delay(10);
+    if (minusButton.isPressed()) {
+      if (inputStr == "") {
+        inputStr = "-0";
+        lcd.print("-");
+      } else {
+        if (inputStr == "-0") lcd.print("0");
+        subtraction(stringToNum(inputStr));
+      }
+    }
+
+    delay(20);
   }
+}
+
+void addition(float n1) {
+  lcd.print(" + ");
+  float n2 = getInputNum();
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
+  float result = n1 + n2;
+  if (result == 0) lcd.print(0);
+  home(result);
+}
+
+void subtraction(float n1) {
+  lcd.print(" - ");
+  float n2 = getInputNum();
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
+  float result = n1 - n2;
+  if (result == 0) lcd.print(0);
+  home(result);
 }
 
 void setup() {
