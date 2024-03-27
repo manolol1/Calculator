@@ -86,7 +86,7 @@ void home(int num) {
   lcd.setCursor(0, 0);
 
   // set initial number if available
-  std::string inputStr
+  std::string inputStr;
   if (num != 0) {
     inputStr = std::to_string(num);
     lcd.print(num);
