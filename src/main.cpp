@@ -103,7 +103,7 @@ float getInputNum() {
     }
 
     if (minusButton.isPressed()) {
-      if (inputStr == "") {
+      if (inputStr == "0") {
         inputStr = "-0";
         lcd.print("-");
       }
