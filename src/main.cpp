@@ -26,12 +26,9 @@ int lcdRows = 2;
 
 LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);
 
-byte fullChar[8] = {0b11111, 0b11111, 0b11111, 0b11111,
-                    0b11111, 0b11111, 0b11111, 0b11111};
-byte upArrow[8] = {0b00100, 0b01110, 0b10101, 0b00100,
-                   0b00100, 0b00100, 0b00100, 0b00000};
-byte downArrow[8] = {0b00000, 0b00100, 0b00100, 0b00100,
-                     0b00100, 0b10101, 0b01110, 0b00100};
+byte fullChar[8] = {0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111};
+byte upArrow[8] = {0b00100, 0b01110, 0b10101, 0b00100, 0b00100, 0b00100, 0b00100, 0b00000};
+byte downArrow[8] = {0b00000, 0b00100, 0b00100, 0b00100, 0b00100, 0b10101, 0b01110, 0b00100};
 
 class Button {
  public:
@@ -283,8 +280,7 @@ void printMenu(String menuEntries[], int index) {
 
 void fnMenu() {
   int menuEntriesLength = 3;
-  String menuEntries[menuEntriesLength] = {"sqrt(x)", "pow(x, y)",
-                                           "Guessing Game"};
+  String menuEntries[menuEntriesLength] = {"sqrt(x)", "pow(x, y)", "Guessing Game"};
   int index = 0;
 
   printMenu(menuEntries, index);
