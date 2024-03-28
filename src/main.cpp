@@ -6,6 +6,7 @@
 void home(float num);
 void error(String line1);
 float stringToNum(String str);
+String formatFloat(float number);
 float getInputNum();
 
 void addition(float n1);
@@ -82,21 +83,32 @@ void error(String line1) {
   }
 }
 
-float stringToNum(std::string str) {
+float stringToNum(String str) {
+  Serial.println(str);
   try {
-    return std::stof(str);
+    return str.toFloat();
   } catch (...) {
     error("Invalid number!");
   }
 }
 
+// only returns decimal places if number has some.
+String formatFloat(float number) {
+  int intPart = static_cast<int>(number);
+  if (number == intPart) { 
+    return String(intPart);
+  } else {
+    return String(number, 4);
+  }
+}
+
 float getInputNum() {
-  std::string inputStr = "0";
+  String inputStr = "0";
   while (true) {
     for (int i = 0; i < 10; i++) {
       if (numberButtons[i].isPressed()) {
         lcd.print(i);
-        inputStr += std::to_string(i);
+        inputStr += String(i);
       }
     }
 
@@ -129,10 +141,10 @@ float getInputNum() {
 
 void home(float num) {
   // set initial number if available
-  std::string inputStr;
+  String inputStr;
   if (num != 0) {
-    inputStr = std::to_string(num);
-    lcd.print(num);
+    inputStr = String(formatFloat(num));
+    lcd.print(formatFloat(num));
   } else {
     inputStr = "0";
   }
@@ -142,7 +154,7 @@ void home(float num) {
     for (int i = 0; i < 10; i++) {
       if (numberButtons[i].isPressed()) {
         lcd.print(i);
-        inputStr += std::to_string(i);
+        inputStr += String(i);
       }
     }
 
@@ -247,14 +259,15 @@ void setup() {
     for (int i = 0; i <= lcdColumns; i++) {
     lcd.setCursor(i, 0);
     lcd.write(0);
-    lcd.setCursor(i, 1);
+    lcd.setCursor(lcdColumns - i, 1);
     lcd.write(0);
     delay(50);
   }
-  for (int i = 0; i <= lcdColumns; i++) {
+  lcd.setCursor(0, 0);
+    for (int i = 0; i <= lcdColumns; i++) {
     lcd.setCursor(i, 0);
     lcd.write(' ');
-    lcd.setCursor(i, 1);
+    lcd.setCursor(lcdColumns - i, 1);
     lcd.write(' ');
     delay(50);
   }
