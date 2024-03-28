@@ -8,19 +8,28 @@ void error(String line1);
 float stringToNum(String str);
 String formatFloat(float number);
 float getInputNum();
+void printMenu(String menuEntries[], int index);
 
 void addition(float n1);
 void subtraction(float n1);
 void multiplication(float n1);
 void division(float n1);
 
+void fnMenu();
+void sqrt();
+void pow();
+
 int lcdColumns = 16;
 int lcdRows = 2;
 
 LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);
 
-byte FullChar[8] = {0b11111, 0b11111, 0b11111, 0b11111,
+byte fullChar[8] = {0b11111, 0b11111, 0b11111, 0b11111,
                     0b11111, 0b11111, 0b11111, 0b11111};
+byte upArrow[8] = {0b00100, 0b01110, 0b10101, 0b00100,
+                   0b00100, 0b00100, 0b00100, 0b00000};
+byte downArrow[8] = {0b00000, 0b00100, 0b00100, 0b00100,
+                     0b00100, 0b10101, 0b01110, 0b00100};
 
 class Button {
  public:
@@ -54,6 +63,8 @@ Button minusButton = Button(2);
 Button multiplyButton = Button(18);
 Button divideButton = Button(19);
 Button fnButton = Button(33);
+Button upButton = Button(5);
+Button downButton = Button(13);
 
 Button numberButtons[10] = {
     Button(26),  // 0
@@ -95,7 +106,7 @@ float stringToNum(String str) {
 // only returns decimal places if number has some.
 String formatFloat(float number) {
   int intPart = static_cast<int>(number);
-  if (number == intPart) { 
+  if (number == intPart) {
     return String(intPart);
   } else {
     return String(number, 4);
@@ -167,6 +178,11 @@ void home(float num) {
       lcd.clear();
       lcd.setCursor(0, 0);
       home(0);
+    }
+
+    if (fnButton.isPressed()) {
+      Serial.print("fn menu opened.");
+      fnMenu();
     }
 
     if (plusButton.isPressed()) {
@@ -246,17 +262,65 @@ void division(float n1) {
   home(result);
 }
 
+void printMenu(String menuEntries[], int index) {
+  lcd.clear();
+      lcd.setCursor(3, 1);
+      lcd.write(1);
+      lcd.print(" Select ");
+      lcd.write(2);
+      lcd.setCursor(0, 0);
+      lcd.print(menuEntries[index]);
+}
+
+void fnMenu() {
+  int menuEntriesLength = 2;
+  String menuEntries[menuEntriesLength] = {"sqrt(x)", "pow(x, y)"};
+  int index = 0;
+
+  printMenu(menuEntries, index);
+
+  while (true) {
+    if (upButton.isPressed()) {
+      if (index == 0) {
+        index = menuEntriesLength - 1;
+      } else {
+        index--;
+      }
+      printMenu(menuEntries, index);
+    }
+
+    if (downButton.isPressed()) {
+      if (index == menuEntriesLength - 1) {
+        index = 0;
+      } else {
+        index++;
+      }
+      printMenu(menuEntries, index);
+    }
+
+    if (clearButton.isPressed()) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      home(0);
+    }
+
+    delay(20);
+  }
+}
+
 void setup() {
   Serial.begin(9600);
   lcd.init();
   lcd.clear();
   lcd.backlight();
 
-  lcd.createChar(0, FullChar);
+  lcd.createChar(0, fullChar);
+  lcd.createChar(1, upArrow);
+  lcd.createChar(2, downArrow);
 
   // display start animation
   lcd.setCursor(0, 0);
-    for (int i = 0; i <= lcdColumns; i++) {
+  for (int i = 0; i <= lcdColumns; i++) {
     lcd.setCursor(i, 0);
     lcd.write(0);
     lcd.setCursor(lcdColumns - i, 1);
@@ -264,14 +328,13 @@ void setup() {
     delay(50);
   }
   lcd.setCursor(0, 0);
-    for (int i = 0; i <= lcdColumns; i++) {
+  for (int i = 0; i <= lcdColumns; i++) {
     lcd.setCursor(i, 0);
     lcd.write(' ');
     lcd.setCursor(lcdColumns - i, 1);
     lcd.write(' ');
     delay(50);
   }
-
 
   lcd.clear();
 
