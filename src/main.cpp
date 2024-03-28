@@ -18,6 +18,9 @@ int lcdRows = 2;
 
 LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);
 
+byte FullChar[8] = {0b11111, 0b11111, 0b11111, 0b11111,
+                    0b11111, 0b11111, 0b11111, 0b11111};
+
 class Button {
  public:
   int pin;
@@ -234,7 +237,29 @@ void division(float n1) {
 void setup() {
   Serial.begin(9600);
   lcd.init();
+  lcd.clear();
   lcd.backlight();
+
+  lcd.createChar(0, FullChar);
+
+  // display start animation
+  lcd.setCursor(0, 0);
+    for (int i = 0; i <= lcdColumns; i++) {
+    lcd.setCursor(i, 0);
+    lcd.write(0);
+    lcd.setCursor(i, 1);
+    lcd.write(0);
+    delay(50);
+  }
+  for (int i = 0; i <= lcdColumns; i++) {
+    lcd.setCursor(i, 0);
+    lcd.write(' ');
+    lcd.setCursor(i, 1);
+    lcd.write(' ');
+    delay(50);
+  }
+
+
   lcd.clear();
 
   home(0);
