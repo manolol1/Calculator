@@ -16,8 +16,8 @@ void multiplication(float n1);
 void division(float n1);
 
 void fnMenu();
-void sqrt();
-void pow();
+void fnSqrt();
+void fnPow();
 
 int lcdColumns = 16;
 int lcdRows = 2;
@@ -81,7 +81,7 @@ Button numberButtons[10] = {
 
 void error(String line1) {
   lcd.clear();
-  lcd.setCursor(0, 0);
+  lcd.home();
   lcd.print(line1);
   lcd.setCursor(0, 1);
   lcd.print("Press Enter");
@@ -114,6 +114,7 @@ String formatFloat(float number) {
 }
 
 float getInputNum() {
+  lcd.blink();
   String inputStr = "0";
   while (true) {
     for (int i = 0; i < 10; i++) {
@@ -136,13 +137,14 @@ float getInputNum() {
     }
 
     if (enterButton.isPressed()) {
+      lcd.noBlink();
       if (inputStr == "-0") lcd.print("0");
       return stringToNum(inputStr);
     }
 
     if (clearButton.isPressed()) {
       lcd.clear();
-      lcd.setCursor(0, 0);
+      lcd.home();
       home(0);
     }
 
@@ -160,6 +162,8 @@ void home(float num) {
     inputStr = "0";
   }
 
+  lcd.blink();
+
   // wait until button is pressed and trigger spicific action
   while (true) {
     for (int i = 0; i < 10; i++) {
@@ -176,12 +180,13 @@ void home(float num) {
 
     if (clearButton.isPressed()) {
       lcd.clear();
-      lcd.setCursor(0, 0);
+      lcd.home();
       home(0);
     }
 
     if (fnButton.isPressed()) {
       Serial.print("fn menu opened.");
+      lcd.noBlink();
       fnMenu();
     }
 
@@ -219,7 +224,7 @@ void addition(float n1) {
   float n2 = getInputNum();
 
   lcd.clear();
-  lcd.setCursor(0, 0);
+  lcd.home();
 
   float result = n1 + n2;
   if (result == 0) lcd.print(0);
@@ -231,7 +236,7 @@ void subtraction(float n1) {
   float n2 = getInputNum();
 
   lcd.clear();
-  lcd.setCursor(0, 0);
+  lcd.home();
 
   float result = n1 - n2;
   if (result == 0) lcd.print(0);
@@ -243,7 +248,7 @@ void multiplication(float n1) {
   float n2 = getInputNum();
 
   lcd.clear();
-  lcd.setCursor(0, 0);
+  lcd.home();
 
   float result = n1 * n2;
   if (result == 0) lcd.print(0);
@@ -255,7 +260,7 @@ void division(float n1) {
   float n2 = getInputNum();
 
   lcd.clear();
-  lcd.setCursor(0, 0);
+  lcd.home();
 
   float result = n1 / n2;
   if (result == 0) lcd.print(0);
@@ -264,12 +269,12 @@ void division(float n1) {
 
 void printMenu(String menuEntries[], int index) {
   lcd.clear();
-      lcd.setCursor(3, 1);
-      lcd.write(1);
-      lcd.print(" Select ");
-      lcd.write(2);
-      lcd.setCursor(0, 0);
-      lcd.print(menuEntries[index]);
+  lcd.setCursor(3, 1);
+  lcd.write(1);
+  lcd.print(" Select ");
+  lcd.write(2);
+  lcd.home();
+  lcd.print(menuEntries[index]);
 }
 
 void fnMenu() {
@@ -280,6 +285,7 @@ void fnMenu() {
   printMenu(menuEntries, index);
 
   while (true) {
+    delay(20);
     if (upButton.isPressed()) {
       if (index == 0) {
         index = menuEntriesLength - 1;
@@ -304,8 +310,57 @@ void fnMenu() {
       home(0);
     }
 
+    if (enterButton.isPressed() || fnButton.isPressed()) {
+      switch (index) {
+        case 0:
+          fnSqrt();
+          break;
+        case 1:
+          fnPow();
+          break;
+      }
+    }
+
     delay(20);
   }
+}
+
+void fnSqrt() {
+  lcd.clear();
+  lcd.setCursor(0, 1);
+  lcd.print("Enter number");
+  lcd.home();
+  lcd.print("sqrt(");
+  float n = getInputNum();
+  lcd.print(")");
+  float result = sqrt(n);
+  lcd.clear();
+  lcd.home();
+  home(result);
+}
+
+void fnPow() {
+  String line1 = "pow(";
+  lcd.clear();
+  lcd.setCursor(0, 1);
+  lcd.print("Enter base");
+  lcd.home();
+  lcd.print(line1);
+  float base = getInputNum();
+  line1 += formatFloat(base);
+  lcd.print(", ");
+  line1 += ", ";
+  lcd.clear();
+  lcd.setCursor(0, 1);
+  lcd.print("Enter exponent");
+  lcd.home();
+  lcd.print(line1);
+  float exponent = getInputNum();
+  lcd.print(")");
+  float result = pow(base, exponent);
+  lcd.clear();
+  lcd.home();
+  home(result);
 }
 
 void setup() {
@@ -319,21 +374,21 @@ void setup() {
   lcd.createChar(2, downArrow);
 
   // display start animation
-  lcd.setCursor(0, 0);
+  lcd.home();
   for (int i = 0; i <= lcdColumns; i++) {
     lcd.setCursor(i, 0);
     lcd.write(0);
     lcd.setCursor(lcdColumns - i, 1);
     lcd.write(0);
-    delay(50);
+    delay(30);
   }
-  lcd.setCursor(0, 0);
+  lcd.home();
   for (int i = 0; i <= lcdColumns; i++) {
     lcd.setCursor(i, 0);
     lcd.write(' ');
     lcd.setCursor(lcdColumns - i, 1);
     lcd.write(' ');
-    delay(50);
+    delay(30);
   }
 
   lcd.clear();
