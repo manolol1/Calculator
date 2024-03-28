@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
+#include <bootloader_random.h>
 
 #include <string>
 
@@ -18,6 +19,7 @@ void division(float n1);
 void fnMenu();
 void fnSqrt();
 void fnPow();
+void fnGuessing();
 
 int lcdColumns = 16;
 int lcdRows = 2;
@@ -117,6 +119,7 @@ float getInputNum() {
   lcd.blink();
   String inputStr = "0";
   while (true) {
+    delay(20);
     for (int i = 0; i < 10; i++) {
       if (numberButtons[i].isPressed()) {
         lcd.print(i);
@@ -166,6 +169,7 @@ void home(float num) {
 
   // wait until button is pressed and trigger spicific action
   while (true) {
+    Serial.println(esp_random() % 100);
     for (int i = 0; i < 10; i++) {
       if (numberButtons[i].isPressed()) {
         lcd.print(i);
@@ -278,8 +282,9 @@ void printMenu(String menuEntries[], int index) {
 }
 
 void fnMenu() {
-  int menuEntriesLength = 2;
-  String menuEntries[menuEntriesLength] = {"sqrt(x)", "pow(x, y)"};
+  int menuEntriesLength = 3;
+  String menuEntries[menuEntriesLength] = {"sqrt(x)", "pow(x, y)",
+                                           "Guessing Game"};
   int index = 0;
 
   printMenu(menuEntries, index);
@@ -310,7 +315,7 @@ void fnMenu() {
       home(0);
     }
 
-    if (enterButton.isPressed() || fnButton.isPressed()) {
+    if (enterButton.isPressed()) {
       switch (index) {
         case 0:
           fnSqrt();
@@ -318,9 +323,11 @@ void fnMenu() {
         case 1:
           fnPow();
           break;
+        case 2:
+          fnGuessing();
+          break;
       }
     }
-
     delay(20);
   }
 }
@@ -363,7 +370,96 @@ void fnPow() {
   home(result);
 }
 
+void fnGuessing() {
+  const int MAX_ATTEMPTS = 7;
+  int random = esp_random() % 100;
+  lcd.clear();
+  lcd.home();
+  lcd.print("Range: 1 - 100");
+  lcd.setCursor(0, 1);
+  lcd.print("Press Enter");
+  while (true) {
+    if (enterButton.isPressed()) {
+      break;
+    }
+    if (clearButton.isPressed()) {
+      home(0);
+    }
+    delay(20);
+  }
+  lcd.clear();
+
+  for (int i = 1; i <= MAX_ATTEMPTS; i++) {
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print("Attempt ");
+    lcd.print(i);
+    lcd.print("/");
+    lcd.print(MAX_ATTEMPTS);
+    lcd.home();
+    int input = getInputNum();
+
+    if (input == random) {
+      lcd.clear();
+      lcd.home();
+      lcd.print("You WON!");
+      lcd.setCursor(0, 1);
+      lcd.print("Enter to replay");
+
+      while (true) {
+        if (enterButton.isPressed()) {
+          fnGuessing();
+        }
+
+        if (clearButton.isPressed()) {
+          home(0);
+        }
+      }
+    } else {
+      lcd.clear();
+      lcd.home();
+      if (input < random) {
+        lcd.print("Greater!");
+      } else {
+        lcd.print("Smaller!");
+      }
+      lcd.setCursor(0, 1);
+      lcd.print("Press Enter");
+      while (true) {
+        if (enterButton.isPressed()) {
+          break;
+        }
+
+        if (clearButton.isPressed()) {
+          home(0);
+        }
+        delay(20);
+      }
+    }
+  }
+
+  lcd.clear();
+  lcd.home();
+  lcd.print("You LOST! (");
+  lcd.print(random);
+  lcd.print(")");
+  lcd.setCursor(0, 1);
+  lcd.print("Enter to retry");
+
+  while (true) {
+    if (enterButton.isPressed()) {
+      fnGuessing();
+    }
+
+    if (clearButton.isPressed()) {
+      home(0);
+    }
+  }
+}
+
 void setup() {
+  bootloader_random_enable();
+
   Serial.begin(9600);
   lcd.init();
   lcd.clear();
