@@ -134,6 +134,7 @@ void home(float num) {
     inputStr = "0";
   }
 
+  // wait until button is pressed and trigger spicific action
   while (true) {
     for (int i = 0; i < 10; i++) {
       if (numberButtons[i].isPressed()) {
@@ -168,6 +169,16 @@ void home(float num) {
       }
     }
 
+    if (multiplyButton.isPressed()) {
+      if (inputStr == "-0") lcd.print("0");
+      multiplication(stringToNum(inputStr));
+    }
+
+    if (divideButton.isPressed()) {
+      if (inputStr == "-0") lcd.print("0");
+      division(stringToNum(inputStr));
+    }
+
     delay(20);
   }
 }
@@ -192,6 +203,30 @@ void subtraction(float n1) {
   lcd.setCursor(0, 0);
 
   float result = n1 - n2;
+  if (result == 0) lcd.print(0);
+  home(result);
+}
+
+void multiplication(float n1) {
+  lcd.print(" * ");
+  float n2 = getInputNum();
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
+  float result = n1 * n2;
+  if (result == 0) lcd.print(0);
+  home(result);
+}
+
+void division(float n1) {
+  lcd.print(" / ");
+  float n2 = getInputNum();
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
+  float result = n1 / n2;
   if (result == 0) lcd.print(0);
   home(result);
 }
