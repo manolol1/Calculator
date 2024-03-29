@@ -410,6 +410,7 @@ void fnGuessing() {
         if (clearButton.isPressed()) {
           home(0);
         }
+        delay(20);
       }
     } else {
       lcd.clear();
@@ -450,6 +451,7 @@ void fnGuessing() {
     if (clearButton.isPressed()) {
       home(0);
     }
+    delay(20);
   }
 }
 
