@@ -26,6 +26,7 @@ int lcdRows = 2;
 
 LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);
 
+// custom characters for display
 byte fullChar[8] = {0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111};
 byte upArrow[8] = {0b00100, 0b01110, 0b10101, 0b00100, 0b00100, 0b00100, 0b00100, 0b00000};
 byte downArrow[8] = {0b00000, 0b00100, 0b00100, 0b00100, 0b00100, 0b10101, 0b01110, 0b00100};
@@ -54,6 +55,7 @@ class Button {
   }
 };
 
+// initialize buttons
 Button enterButton = Button(4);
 Button clearButton = Button(35);
 Button dotButton = Button(14);
